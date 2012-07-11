@@ -1,0 +1,18 @@
+--- libxenserver/Makefile.orig	2011-09-21 17:13:22.000000000 +0200
++++ libxenserver/Makefile	2012-07-11 20:29:31.885727725 +0200
+@@ -56,13 +56,13 @@
+ 	ln -sf $< $@
+ 
+ libxenserver.so.$(MAJOR).$(MINOR): $(LIBXENAPI_OBJS)
+-	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxenserver.so.$(MAJOR) $(SHLIB_CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxenserver.so.$(MAJOR) $(SHLIB_CFLAGS) -o $@ $^ $(LIBS)
+ 
+ libxenserver.a: $(LIBXENAPI_OBJS)
+ 	$(AR) rcs libxenserver.a $^
+ 
+ $(TEST_PROGRAMS): test/%: test/%.o libxenserver.so
+-	$(CC) $(LDFLAGS) -o $@ $< -L . -lxenserver
++	$(CC) $(LDFLAGS) -o $@ $< -L . -lxenserver $(LIBS)
+ 
+ 
+ .PHONY: install
