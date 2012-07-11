@@ -56,7 +56,7 @@ Statyczna biblioteka libxenserver.
 %patch0 -p1
 
 %build
-%{__make} all libxenserver.a uberheader \
+%{__make} all libxenserver.a \
 	CC="%{__cc}" \
 	CFLAGS="%{rpmcflags} -Iinclude $(xml2-config --cflags) $(curl-config --cflags) -W -Wall -std=c99 -fPIC" \
 	LDFLAGS="%{rpmldflags}" \
