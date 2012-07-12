@@ -1,5 +1,27 @@
 --- libxenserver/Makefile.orig	2011-09-21 17:13:22.000000000 +0200
 +++ libxenserver/Makefile	2012-07-11 20:29:31.885727725 +0200
+@@ -24,9 +24,9 @@
+          $(shell curl-config --cflags) \
+          -W -Wall -Wmissing-prototypes -Werror -std=c99 -fPIC
+ 
+-LDFLAGS = -g $(shell xml2-config --libs) \
+-          $(shell curl-config --libs) \
+-	  -Wl,-rpath,$(shell pwd)
++LDFLAGS = -g
++LIBS = $(shell xml2-config --libs)
++PROG_LIBS = $(LIBS) $(shell curl-config --libs)
+ 
+ # -h for Solaris
+ SONAME_LDFLAG ?= -soname
+@@ -38,7 +38,7 @@
+ INSTALL_DIR  = $(INSTALL) -d -m0755 -p
+ INSTALL_DATA = $(INSTALL) -m0644 -p
+ 
+-LIBXENAPI_HDRS = $(wildcard include/*.h)
++LIBXENAPI_HDRS = $(wildcard include/xen/api/*.h)
+ LIBXENAPI_OBJS = $(patsubst %.c, %.o, $(wildcard src/*.c))
+ 
+ TEST_PROGRAMS = test/test_vm_ops test/test_event_handling \
 @@ -56,13 +56,13 @@
  	ln -sf $< $@
  
@@ -12,7 +34,7 @@
  
  $(TEST_PROGRAMS): test/%: test/%.o libxenserver.so
 -	$(CC) $(LDFLAGS) -o $@ $< -L . -lxenserver
-+	$(CC) $(LDFLAGS) -o $@ $< -L . -lxenserver $(LIBS)
++	$(CC) $(LDFLAGS) -o $@ $< -L . -lxenserver $(PROG_LIBS)
  
  
  .PHONY: install

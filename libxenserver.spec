@@ -2,7 +2,7 @@ Summary:	An SDK for Citrix XenServer, exposing the XenServer API
 Summary(pl.UTF-8):	SDK dla Citrix XenServera, udostępniające API XenServer
 Name:		libxenserver
 Version:	6.0.0
-Release:	1
+Release:	2
 License:	LGPL v2.1+
 Group:		Libraries
 # http://community.citrix.com/display/xs/Download+SDKs
@@ -59,8 +59,7 @@ Statyczna biblioteka libxenserver.
 %{__make} all libxenserver.a \
 	CC="%{__cc}" \
 	CFLAGS="%{rpmcflags} -Iinclude $(xml2-config --cflags) $(curl-config --cflags) -W -Wall -std=c99 -fPIC" \
-	LDFLAGS="%{rpmldflags}" \
-	LIBS="$(xml2-config --libs) $(curl-config --libs)"
+	LDFLAGS="%{rpmldflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
