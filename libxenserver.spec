@@ -1,15 +1,16 @@
+# TODO: C#(?), Java, Python
 Summary:	An SDK for Citrix XenServer, exposing the XenServer API
 Summary(pl.UTF-8):	SDK dla Citrix XenServera, udostępniające API XenServer
 Name:		libxenserver
-Version:	6.0.0
-Release:	3
-License:	LGPL v2.1+
+Version:	6.5.0.SP1
+Release:	1
+License:	BSD
 Group:		Libraries
-# http://community.citrix.com/display/xs/Download+SDKs
-Source0:	http://community.citrix.com/download/attachments/38633496/%{name}-%{version}-1-src.tar.bz2
-# Source0-md5:	27faa9249092ad823cef3c3850240a21
+#Source0Download: http://xenserver.org/partners/developing-products-for-xenserver.html
+Source0:	http://downloadns.citrix.com.edgesuite.net/10342/XenServer-6.5.0-SP1-SDK.zip
+# Source0-md5:	795709a8639b5ba4849f322c8fe7d4dd
 Patch0:		%{name}-make.patch
-URL:		http://community.citrix.com/display/xs/Home
+URL:		http://xenserver.org/partners/developing-products-for-xenserver.html
 BuildRequires:	curl-devel
 BuildRequires:	libxml2-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -52,11 +53,14 @@ Statyczna biblioteka libxenserver.
 
 
 %prep
-%setup -q -n %{name}
-%patch0 -p1
+%setup -q -n XenServer-SDK
+%patch0 -p0
+
+# precompiled binaries
+%{__rm} libxenserver/bin/*
 
 %build
-%{__make} all libxenserver.a \
+%{__make} -C libxenserver/src all libxenserver.a \
 	CC="%{__cc}" \
 	CFLAGS="%{rpmcflags} -Iinclude $(xml2-config --cflags) $(curl-config --cflags) -W -Wall -std=c99 -fPIC" \
 	LDFLAGS="%{rpmldflags}"
@@ -64,11 +68,11 @@ Statyczna biblioteka libxenserver.
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
+%{__make} -C libxenserver/src install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL="%{__install} -p" \
 	INSTALL_PROG="%{__install} -p -m755" \
-	LIBDIR="%{_lib}"
+	LIBDIR=%{_libdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -78,9 +82,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc README
+%doc libxenserver/{COPYING,README}
 %attr(755,root,root) %{_libdir}/libxenserver.so.*.*
-%attr(755,root,root) %ghost %{_libdir}/libxenserver.so.1
+%attr(755,root,root) %ghost %{_libdir}/libxenserver.so.2
 
 %files devel
 %defattr(644,root,root,755)
