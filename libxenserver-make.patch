@@ -1,5 +1,5 @@
---- libxenserver/src/Makefile.orig	2015-04-17 19:33:43.000000000 +0200
-+++ libxenserver/src/Makefile	2015-10-25 22:02:39.745774106 +0100
+--- libxenserver/src/Makefile.orig	2017-05-11 17:10:12.000000000 +0200
++++ libxenserver/src/Makefile	2017-08-01 16:19:26.024452548 +0200
 @@ -45,9 +45,9 @@
           $(shell curl-config --cflags) \
           -W -Wall -Wmissing-prototypes -Werror -std=c99 $(POS_FLAG)
@@ -13,9 +13,9 @@
  
  # -h for Solaris
  SONAME_LDFLAG ?= -soname
-@@ -66,6 +66,10 @@
+@@ -64,6 +64,10 @@
  
- TARBALL_DEST = libxenserver-2.4
+ TEST_PROGRAMS = $(patsubst %.c, %, $(wildcard test/*.c))
  
 +PREFIX = /usr
 +INCLUDEDIR = $(PREFIX)/include
@@ -24,10 +24,10 @@
  .PHONY: all
  all: $(TEST_PROGRAMS)
  
-@@ -76,28 +80,25 @@
+@@ -74,28 +78,28 @@
  	ln -sf $< $@
  
- libxenserver.so.2.4: $(LIBXENAPI_OBJS)
+ libxenserver.so.2.7: $(LIBXENAPI_OBJS)
 -	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxenserver.so.2 $(SHLIB_CFLAGS) -o $@ $^
 +	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxenserver.so.2 $(SHLIB_CFLAGS) -o $@ $^ $(LIBS)
  
@@ -43,19 +43,20 @@
  install: all libxenserver.a
 -	$(INSTALL_DIR) $(DESTDIR)/include/xen/api
 -	$(INSTALL_DIR) $(DESTDIR)/lib
--	$(INSTALL_DATA) libxenserver.so.2.4 $(DESTDIR)/lib
--	ln -sf libxenserver.so.2.4 $(DESTDIR)/lib/libxenserver.so.2
+-	$(INSTALL_DATA) libxenserver.so.2.7 $(DESTDIR)/lib
+-	ln -sf libxenserver.so.2.7 $(DESTDIR)/lib/libxenserver.so.2
 -	ln -sf libxenserver.so.2 $(DESTDIR)/lib/libxenserver.so
 -	$(INSTALL_DATA) libxenserver.a $(DESTDIR)/lib
--	for i in $(LIBXENAPI_HDRS_INT); do \
--	    $(INSTALL_DATA) $$i $(DESTDIR)/include/; \
--	done
 +	$(INSTALL_DIR) $(DESTDIR)$(INCLUDEDIR)/xen/api
 +	$(INSTALL_DIR) $(DESTDIR)$(LIBDIR)
-+	$(INSTALL_DATA) libxenserver.so.2.4 $(DESTDIR)$(LIBDIR)
-+	ln -sf libxenserver.so.2.4 $(DESTDIR)$(LIBDIR)/libxenserver.so.2
++	$(INSTALL_DATA) libxenserver.so.2.7 $(DESTDIR)$(LIBDIR)
++	ln -sf libxenserver.so.2.7 $(DESTDIR)$(LIBDIR)/libxenserver.so.2
 +	ln -sf libxenserver.so.2 $(DESTDIR)$(LIBDIR)/libxenserver.so
 +	$(INSTALL_DATA) libxenserver.a $(DESTDIR)$(LIBDIR)
+ 	for i in $(LIBXENAPI_HDRS_INT); do \
+-	    $(INSTALL_DATA) $$i $(DESTDIR)/include/; \
++	    $(INSTALL_DATA) $$i $(DESTDIR)$(INCLUDEDIR)/; \
+ 	done
  	for i in $(LIBXENAPI_HDRS); do \
 -	    $(INSTALL_DATA) $$i $(DESTDIR)/include/xen/api; \
 +	    $(INSTALL_DATA) $$i $(DESTDIR)$(INCLUDEDIR)/xen/api; \
