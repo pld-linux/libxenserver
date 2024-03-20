@@ -1,6 +1,18 @@
---- libxenserver/src/Makefile.orig	2017-05-11 17:10:12.000000000 +0200
-+++ libxenserver/src/Makefile	2017-08-01 16:19:26.024452548 +0200
-@@ -45,9 +45,9 @@
+--- XenServer-SDK/libxenserver/src/Makefile.orig	2024-01-11 09:33:24.000000000 +0100
++++ XenServer-SDK/libxenserver/src/Makefile	2024-03-20 21:40:11.671420662 +0100
+@@ -27,7 +27,10 @@
+ # OF THE POSSIBILITY OF SUCH DAMAGE.
+ 
+ 
+-DESTDIR=/usr/local
++DESTDIR=
++PREFIX=/usr/local
++INCLUDEDIR=$(PREFIX)/include
++LIBDIR=$(PREFIX)/lib
+ 
+ ifeq ($(CYGWIN), 1)
+ 	CYGWIN_LIBXML = -L/bin -lxml2-2
+@@ -41,9 +44,9 @@ CFLAGS = -g -Iinclude \
           $(shell curl-config --cflags) \
           -W -Wall -Wmissing-prototypes -Werror -std=c99 $(POS_FLAG)
  
@@ -13,53 +25,38 @@
  
  # -h for Solaris
  SONAME_LDFLAG ?= -soname
-@@ -64,6 +64,10 @@
- 
- TEST_PROGRAMS = $(patsubst %.c, %, $(wildcard test/*.c))
- 
-+PREFIX = /usr
-+INCLUDEDIR = $(PREFIX)/include
-+LIBDIR = $(PREFIX)/lib
-+
- .PHONY: all
- all: $(TEST_PROGRAMS)
- 
-@@ -74,28 +78,28 @@
+@@ -67,7 +70,7 @@ libxenserver.so.2: libxenserver.so.2.20
  	ln -sf $< $@
  
- libxenserver.so.2.7: $(LIBXENAPI_OBJS)
--	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxenserver.so.2 $(SHLIB_CFLAGS) -o $@ $^
-+	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG) -Wl,libxenserver.so.2 $(SHLIB_CFLAGS) -o $@ $^ $(LIBS)
+ libxenserver.so.2.20: $(LIBXENAPI_OBJS)
+-	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG),libxenserver.so.2 $(SHLIB_CFLAGS) -o $@ $^
++	$(CC) $(CFLAGS) $(LDFLAGS) -Wl,$(SONAME_LDFLAG),libxenserver.so.2 $(SHLIB_CFLAGS) -o $@ $^ $(LIBS)
  
  libxenserver.a: $(LIBXENAPI_OBJS)
  	$(AR) rcs libxenserver.a $^
+@@ -75,17 +78,17 @@ libxenserver.a: $(LIBXENAPI_OBJS)
+ build: libxenserver.so libxenserver.a
  
- $(TEST_PROGRAMS): test/%: test/%.o libxenserver.so
--	$(CC) -o $@ $< $(TEST_LDFLAGS) $(LDFLAGS)
-+	$(CC) -o $@ $< $(TEST_LDFLAGS) $(LDFLAGS) $(PROG_LIBS)
- 
- 
- .PHONY: install
- install: all libxenserver.a
+ install: build
 -	$(INSTALL_DIR) $(DESTDIR)/include/xen/api
 -	$(INSTALL_DIR) $(DESTDIR)/lib
--	$(INSTALL_DATA) libxenserver.so.2.7 $(DESTDIR)/lib
--	ln -sf libxenserver.so.2.7 $(DESTDIR)/lib/libxenserver.so.2
+-	$(INSTALL_DATA) libxenserver.so.2.20 $(DESTDIR)/lib
+-	ln -sf libxenserver.so.2.20 $(DESTDIR)/lib/libxenserver.so.2
 -	ln -sf libxenserver.so.2 $(DESTDIR)/lib/libxenserver.so
--	$(INSTALL_DATA) libxenserver.a $(DESTDIR)/lib
 +	$(INSTALL_DIR) $(DESTDIR)$(INCLUDEDIR)/xen/api
 +	$(INSTALL_DIR) $(DESTDIR)$(LIBDIR)
-+	$(INSTALL_DATA) libxenserver.so.2.7 $(DESTDIR)$(LIBDIR)
-+	ln -sf libxenserver.so.2.7 $(DESTDIR)$(LIBDIR)/libxenserver.so.2
++	$(INSTALL_DATA) libxenserver.so.2.20 $(DESTDIR)$(LIBDIR)
++	ln -sf libxenserver.so.2.20 $(DESTDIR)$(LIBDIR)/libxenserver.so.2
 +	ln -sf libxenserver.so.2 $(DESTDIR)$(LIBDIR)/libxenserver.so
+ ifeq ($(CYGWIN), 1)
+-	ln -sf libxenserver.so $(DESTDIR)/lib/libxenserver.dll
++	ln -sf libxenserver.so $(DESTDIR)$(LIBDIR)/libxenserver.dll
+ endif
+-	$(INSTALL_DATA) libxenserver.a $(DESTDIR)/lib
 +	$(INSTALL_DATA) libxenserver.a $(DESTDIR)$(LIBDIR)
- 	for i in $(LIBXENAPI_HDRS_INT); do \
--	    $(INSTALL_DATA) $$i $(DESTDIR)/include/; \
-+	    $(INSTALL_DATA) $$i $(DESTDIR)$(INCLUDEDIR)/; \
- 	done
  	for i in $(LIBXENAPI_HDRS); do \
 -	    $(INSTALL_DATA) $$i $(DESTDIR)/include/xen/api; \
 +	    $(INSTALL_DATA) $$i $(DESTDIR)$(INCLUDEDIR)/xen/api; \
  	done
  
- 
+ clean:

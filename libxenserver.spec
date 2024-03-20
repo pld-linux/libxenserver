@@ -2,18 +2,16 @@
 Summary:	An SDK for Citrix XenServer, exposing the XenServer API
 Summary(pl.UTF-8):	SDK dla Citrix XenServera, udostępniające API XenServer
 Name:		libxenserver
-Version:	7.2.0
+Version:	24.1.0
 Release:	1
 License:	BSD
 Group:		Libraries
-# download: http://xenserver.org/partners/developing-products-for-xenserver.html
-# /Download SDK -> Software Development Kit
-# e.g. https://www.citrix.com/downloads/xenserver/product-software/xenserver-72-standard-edition.html
-# /SDK (then see at "rel" <a href=...> attribute)
-Source0:	http://downloadns.citrix.com.edgesuite.net/12642/XenServer-%{version}-SDK.zip
-# Source0-md5:	97b9f76d21dbddc055fb8a0af20e90e8
+# download: https://www.xenserver.com/downloads
+# /SDK
+Source0:	https://downloads.xenserver.com/sdk/%{version}/XenServer-SDK-%{version}.zip
+# Source0-md5:	5ec46a037504c53a3e1844ae448ff6a9
 Patch0:		%{name}-make.patch
-URL:		http://xenserver.org/partners/developing-products-for-xenserver.html
+URL:		https://www.xenserver.com/
 BuildRequires:	curl-devel
 BuildRequires:	libxml2-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -68,13 +66,13 @@ Statyczna biblioteka libxenserver.
 
 %prep
 %setup -q -n XenServer-SDK
-%patch0 -p0
+%patch0 -p1
 
 # precompiled binaries
 %{__rm} libxenserver/bin/*
 
 %build
-%{__make} -C libxenserver/src all libxenserver.a \
+%{__make} -C libxenserver/src \
 	CC="%{__cc}" \
 	CFLAGS="%{rpmcflags} -Iinclude $(xml2-config --cflags) $(curl-config --cflags) -W -Wall -std=c99 -fPIC" \
 	LDFLAGS="%{rpmldflags}"
@@ -84,9 +82,12 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__make} -C libxenserver/src install \
 	DESTDIR=$RPM_BUILD_ROOT \
+	INCLUDEDIR=%{_includedir} \
 	INSTALL="%{__install} -p" \
 	INSTALL_PROG="%{__install} -p -m755" \
 	LIBDIR=%{_libdir}
+
+cp -p libxenserver/src/include/xen*_internal.h $RPM_BUILD_ROOT%{_includedir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
