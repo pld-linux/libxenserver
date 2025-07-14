@@ -66,7 +66,7 @@ Statyczna biblioteka libxenserver.
 
 %prep
 %setup -q -n XenServer-SDK
-%patch0 -p1
+%patch -P0 -p1
 
 # precompiled binaries
 %{__rm} libxenserver/bin/*
