@@ -3,7 +3,7 @@ Summary:	An SDK for Citrix XenServer, exposing the XenServer API
 Summary(pl.UTF-8):	SDK dla Citrix XenServera, udostępniające API XenServer
 Name:		libxenserver
 Version:	24.1.0
-Release:	1
+Release:	2
 License:	BSD
 Group:		Libraries
 # download: https://www.xenserver.com/downloads
